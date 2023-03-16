@@ -10,6 +10,14 @@
 	color: #fff;
 	padding: 2px;
 
+	&.is-style-squared {
+		border-radius: 0;
+	}
+
+	&.is-style-rounded {
+		border-radius: 10px;
+	}
+
 	&.has-shadow {
 		box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 
