@@ -18,6 +18,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./editor.scss */ "./src/editor.scss");
 
 
 
@@ -25,7 +30,9 @@ __webpack_require__.r(__webpack_exports__);
 // Note that this has been commented out as it says it's not allowed to be used and results in an error.
 // eslint-disable-next-line
 // import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
-// import './editor.scss';
+
+
+
 
 // const { __Visualizer: BoxControlVisualizer } = BoxControl; // We deconstruct __Visualizer out of BoxControl and re-name it as BoxControlVIsualizer.
 
@@ -37,7 +44,9 @@ function Edit(props) {
   const {
     text,
     alignment,
-    style
+    style,
+    shadow,
+    shadowOpacity
   } = attributes;
   const onChangeAlignment = newAlignment => {
     setAttributes({
@@ -49,11 +58,41 @@ function Edit(props) {
       text: newText
     });
   };
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.BlockControls, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.AlignmentToolbar, {
+  const onChangeShadowOpacity = newShadowOpacity => {
+    setAttributes({
+      shadowOpacity: newShadowOpacity
+    });
+  };
+  const toggleShadow = () => {
+    setAttributes({
+      shadow: !shadow
+    });
+  };
+  const classes = classnames__WEBPACK_IMPORTED_MODULE_4___default()(`text-box-align-${alignment}`, {
+    'has-shadow': shadow,
+    [`shadow-opacity-${shadowOpacity}`]: shadow && shadowOpacity
+  });
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, shadow && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Shadow Setting', 'text-box')
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.RangeControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Shadow Opacity', 'text-box'),
+    value: shadowOpacity,
+    min: 10,
+    max: 40,
+    step: 10,
+    onChange: onChangeShadowOpacity
+  }))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.BlockControls, {
+    controls: [{
+      icon: 'admin-page',
+      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Shadow', 'text-box'),
+      onClick: toggleShadow,
+      isActive: shadow
+    }]
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.AlignmentToolbar, {
     value: alignment,
     onChange: onChangeAlignment
   })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)({
-    className: `text-box-align-${alignment}`
+    className: classes
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText, {
     className: "text-box-title",
     onChange: onChangeText,
@@ -179,9 +218,14 @@ function save(_ref) {
   } = _ref;
   const {
     text,
-    alignment
+    alignment,
+    shadow,
+    shadowOpacity
   } = attributes;
-  const classes = classnames__WEBPACK_IMPORTED_MODULE_3___default()(`text-box-align-${alignment}`);
+  const classes = classnames__WEBPACK_IMPORTED_MODULE_3___default()(`text-box-align-${alignment}`, {
+    'has-shadow': shadow,
+    [`shadow-opacity-${shadowOpacity}`]: shadow && shadowOpacity
+  });
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText.Content, (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps.save({
     className: classes
   }), {
@@ -263,6 +307,19 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 
+/***/ "./src/editor.scss":
+/*!*************************!*\
+  !*** ./src/editor.scss ***!
+  \*************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ }),
+
 /***/ "./src/style.scss":
 /*!************************!*\
   !*** ./src/style.scss ***!
@@ -295,6 +352,17 @@ module.exports = window["wp"]["blockEditor"];
 
 "use strict";
 module.exports = window["wp"]["blocks"];
+
+/***/ }),
+
+/***/ "@wordpress/components":
+/*!************************************!*\
+  !*** external ["wp","components"] ***!
+  \************************************/
+/***/ (function(module) {
+
+"use strict";
+module.exports = window["wp"]["components"];
 
 /***/ }),
 
@@ -355,7 +423,7 @@ function _extends() {
 /***/ (function(module) {
 
 "use strict";
-module.exports = JSON.parse('{"apiVersion":2,"name":"blocks-course/text-box","title":"Text Box","category":"text","icon":"text-page","description":"A box of text.","keywords":["text","paragraph","box"],"supports":{"html":false,"color":{"background":true,"text":true,"gradients":true},"spacing":{"padding":true}},"textdomain":"text-box","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"text":{"type":"string","source":"html","selector":"h4"},"alignment":{"type":"string","default":"left"},"backgroundColor":{"type":"string"},"textColor":{"type":"string","default":"very-light-gray"},"gradient":{"type":"string"},"style":{"type":"object","default":{"color":{"background":"#f03"},"spacing":{"padding":{"top":"50px","right":"50px","bottom":"50px","left":"50px"}}}}}}');
+module.exports = JSON.parse('{"apiVersion":2,"name":"blocks-course/text-box","title":"Text Box","category":"text","icon":"text-page","description":"A box of text.","keywords":["text","paragraph","box"],"supports":{"html":false,"color":{"background":true,"text":true,"gradients":true},"spacing":{"padding":true}},"textdomain":"text-box","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"text":{"type":"string","source":"html","selector":"h4"},"alignment":{"type":"string","default":"left"},"shadow":{"type":"boolean","default":false},"shadowOpacity":{"type":"number","default":30},"backgroundColor":{"type":"string"},"textColor":{"type":"string","default":"very-light-gray"},"gradient":{"type":"string"},"style":{"type":"object","default":{"color":{"background":"#f03"},"spacing":{"padding":{"top":"50px","right":"50px","bottom":"50px","left":"50px"}}}}}}');
 
 /***/ })
 
