@@ -24,6 +24,7 @@
 		"@wordpress/scripts": "^25.4.0",
 		"@wordpress/stylelint-config": "^21.10.0",
 		"eslint-config-prettier": "^8.6.0",
+		"lodash": "^4.17.21",
 		"stylelint": "^14.16.1"
 	},
 	"dependencies": {

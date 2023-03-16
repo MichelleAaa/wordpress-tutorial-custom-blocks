@@ -43,14 +43,14 @@ function Edit(props) {
   } = props;
   const {
     text,
-    alignment,
+    textAlignment,
     style,
     shadow,
     shadowOpacity
   } = attributes;
   const onChangeAlignment = newAlignment => {
     setAttributes({
-      alignment: newAlignment
+      textAlignment: newAlignment
     });
   };
   const onChangeText = newText => {
@@ -68,7 +68,7 @@ function Edit(props) {
       shadow: !shadow
     });
   };
-  const classes = classnames__WEBPACK_IMPORTED_MODULE_4___default()(`text-box-align-${alignment}`, {
+  const classes = classnames__WEBPACK_IMPORTED_MODULE_4___default()(`text-box-align-${textAlignment}`, {
     'has-shadow': shadow,
     [`shadow-opacity-${shadowOpacity}`]: shadow && shadowOpacity
   });
@@ -89,7 +89,7 @@ function Edit(props) {
       isActive: shadow
     }]
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.AlignmentToolbar, {
-    value: alignment,
+    value: textAlignment,
     onChange: onChangeAlignment
   })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)({
     className: classes
@@ -124,6 +124,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _save__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./save */ "./src/save.js");
 /* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./block.json */ "./src/block.json");
 /* harmony import */ var _v1__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./v1 */ "./src/v1.js");
+/* harmony import */ var _v2__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./v2 */ "./src/v2.js");
 /**
  * Registers a new block provided a unique name and an object defining its behavior.
  *
@@ -143,6 +144,7 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * Internal dependencies
  */
+
 
 
 
@@ -185,7 +187,8 @@ __webpack_require__.r(__webpack_exports__);
    */
   save: _save__WEBPACK_IMPORTED_MODULE_4__["default"],
   // Here we can have an array for each depricated version. You can type it in here, but instead, we are importing it.
-  deprecated: [_v1__WEBPACK_IMPORTED_MODULE_6__["default"]],
+  // You have to add them in reverse chronological order, which is why it's v2, v1, becuase WP will try to validate the block in this order.
+  deprecated: [_v2__WEBPACK_IMPORTED_MODULE_7__["default"], _v1__WEBPACK_IMPORTED_MODULE_6__["default"]],
   // This adds a variation. The details are different from the block.json file since we are making a new name and title, etc.
   // Now in our block, we have a new block that is called Gradient Text Box. It has the same functionality, just has a different default gradient background.
   variations: [{
@@ -210,7 +213,7 @@ __webpack_require__.r(__webpack_exports__);
         } = _ref;
         return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('blocks-course/text-box', {
           text: content,
-          alignment: align
+          textAlignment: align
         });
       }
     },
@@ -248,11 +251,11 @@ __webpack_require__.r(__webpack_exports__);
       transform: _ref3 => {
         let {
           text,
-          alignment
+          textAlignment
         } = _ref3;
         return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('core/paragraph', {
           content: text,
-          align: alignment
+          align: textAlignment
         });
       }
     }]
@@ -295,11 +298,11 @@ function save(_ref) {
   } = _ref;
   const {
     text,
-    alignment,
+    textAlignment,
     shadow,
     shadowOpacity
   } = attributes;
-  const classes = classnames__WEBPACK_IMPORTED_MODULE_3___default()(`text-box-align-${alignment}`, {
+  const classes = classnames__WEBPACK_IMPORTED_MODULE_3___default()(`text-box-align-${textAlignment}`, {
     'has-shadow': shadow,
     [`shadow-opacity-${shadowOpacity}`]: shadow && shadowOpacity
   });
@@ -330,7 +333,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
 /* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./block.json */ "./src/block.json");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./block.json */ "./src/block.json");
+
 
 
 
@@ -353,14 +359,25 @@ const v1 = {
     }
   },
   attributes: {
-    // here, we are importing all of the other attributes from block.json. The extra one listed below is to overwrite the changed selector value.
-    ..._block_json__WEBPACK_IMPORTED_MODULE_4__.attributes,
+    // here, we are updating for v2 deprecation, which changes from alignment to textAlignment:
+    ...(0,lodash__WEBPACK_IMPORTED_MODULE_4__.omit)(_block_json__WEBPACK_IMPORTED_MODULE_5__.attributes, ['textAlignment']),
+    alignment: {
+      type: 'string',
+      default: 'left'
+    },
+    // This was for the first deprecation:
     text: {
       type: 'string',
       source: 'html',
-      // Everything is the same except for the selector, which in the previous version was h4:
       selector: 'h4'
     }
+  },
+  // This is for the v2 deprecation:
+  migrate: attributes => {
+    return {
+      ...(0,lodash__WEBPACK_IMPORTED_MODULE_4__.omit)(attributes, ['alignment']),
+      textAlignment: attributes.alignment
+    };
   },
   save: _ref => {
     let {
@@ -385,6 +402,85 @@ const v1 = {
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (v1);
+
+/***/ }),
+
+/***/ "./src/v2.js":
+/*!*******************!*\
+  !*** ./src/v2.js ***!
+  \*******************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./block.json */ "./src/block.json");
+
+
+
+
+// The omit function removes a key from an object. So we have the attributes object from block.json, and we are going to use omit to remove an key from it.
+
+
+const v2 = {
+  supports: {
+    html: false,
+    color: {
+      background: true,
+      text: true,
+      gradients: true
+    },
+    spacing: {
+      padding: true
+    }
+  },
+  attributes: {
+    // Here, we areadding in all the attributes, and just omitting the textAlignment value from the block.json's attributes, becuase in the old version it was called alignment. Then below, we are adding alignment, the old value, back in.
+    ...(0,lodash__WEBPACK_IMPORTED_MODULE_4__.omit)(_block_json__WEBPACK_IMPORTED_MODULE_5__.attributes, ['textAlignment']),
+    alignment: {
+      type: 'string',
+      default: 'left'
+    }
+  },
+  // The migrate function receives the attribute or attributes of the old version of block.json. You then return the old attribute and return the new attribute (aka the new attribute name is textAlignment).
+  // This migrate function is required for the Edit function to work correctly on the deprecated blocks.
+  migrate: attributes => {
+    return {
+      ...(0,lodash__WEBPACK_IMPORTED_MODULE_4__.omit)(attributes, ['alignment']),
+      textAlignment: attributes.alignment
+    };
+  },
+  save: _ref => {
+    let {
+      attributes
+    } = _ref;
+    const {
+      text,
+      alignment,
+      shadow,
+      shadowOpacity
+    } = attributes;
+    const classes = classnames__WEBPACK_IMPORTED_MODULE_3___default()(`text-box-align-${alignment}`, {
+      'has-shadow': shadow,
+      [`shadow-opacity-${shadowOpacity}`]: shadow && shadowOpacity
+    });
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText.Content, (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps.save({
+      className: classes
+    }), {
+      tagName: "p",
+      value: text
+    }));
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = (v2);
 
 /***/ }),
 
@@ -483,6 +579,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "lodash":
+/*!*************************!*\
+  !*** external "lodash" ***!
+  \*************************/
+/***/ (function(module) {
+
+"use strict";
+module.exports = window["lodash"];
+
+/***/ }),
+
 /***/ "@wordpress/block-editor":
 /*!*************************************!*\
   !*** external ["wp","blockEditor"] ***!
@@ -573,7 +680,7 @@ function _extends() {
 /***/ (function(module) {
 
 "use strict";
-module.exports = JSON.parse('{"apiVersion":2,"name":"blocks-course/text-box","title":"Text Box","category":"text","icon":"text-page","description":"A box of text.","keywords":["text","paragraph","box"],"supports":{"html":false,"color":{"background":true,"text":true,"gradients":true},"spacing":{"padding":true}},"styles":[{"name":"squared","label":"Squared","isDefault":true},{"name":"rounded","label":"Rounded"}],"example":{"attributes":{"text":"This is some text!","gradient":"red-to-blue","shadow":true}},"textdomain":"text-box","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"text":{"type":"string","source":"html","selector":"p"},"alignment":{"type":"string","default":"left"},"shadow":{"type":"boolean","default":false},"shadowOpacity":{"type":"number","default":30},"backgroundColor":{"type":"string"},"textColor":{"type":"string","default":"very-light-gray"},"gradient":{"type":"string"},"style":{"type":"object","default":{"color":{"background":"#f03"},"spacing":{"padding":{"top":"50px","right":"50px","bottom":"50px","left":"50px"}}}}}}');
+module.exports = JSON.parse('{"apiVersion":2,"name":"blocks-course/text-box","title":"Text Box","category":"text","icon":"text-page","description":"A box of text.","keywords":["text","paragraph","box"],"supports":{"html":false,"color":{"background":true,"text":true,"gradients":true},"spacing":{"padding":true}},"styles":[{"name":"squared","label":"Squared","isDefault":true},{"name":"rounded","label":"Rounded"}],"example":{"attributes":{"text":"This is some text!","gradient":"red-to-blue","shadow":true}},"textdomain":"text-box","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"text":{"type":"string","source":"html","selector":"p"},"textAlignment":{"type":"string","default":"left"},"shadow":{"type":"boolean","default":false},"shadowOpacity":{"type":"number","default":30},"backgroundColor":{"type":"string"},"textColor":{"type":"string","default":"very-light-gray"},"gradient":{"type":"string"},"style":{"type":"object","default":{"color":{"background":"#f03"},"spacing":{"padding":{"top":"50px","right":"50px","bottom":"50px","left":"50px"}}}}}}');
 
 /***/ })
 

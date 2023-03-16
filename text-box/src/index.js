@@ -21,6 +21,7 @@ import Edit from './edit';
 import save from './save';
 import metadata from './block.json';
 import v1 from './v1';
+import v2 from './v2';
 
 /**
  * Every block starts by registering a new block type definition.
@@ -60,7 +61,8 @@ registerBlockType( metadata.name, {
 	 */
 	save,
 	// Here we can have an array for each depricated version. You can type it in here, but instead, we are importing it.
-	deprecated: [ v1 ],
+	// You have to add them in reverse chronological order, which is why it's v2, v1, becuase WP will try to validate the block in this order.
+	deprecated: [ v2, v1 ],
 	// This adds a variation. The details are different from the block.json file since we are making a new name and title, etc.
 	// Now in our block, we have a new block that is called Gradient Text Box. It has the same functionality, just has a different default gradient background.
 	variations: [
@@ -84,7 +86,7 @@ registerBlockType( metadata.name, {
 				transform: ( { content, align } ) => {
 					return createBlock( 'blocks-course/text-box', {
 						text: content,
-						alignment: align,
+						textAlignment: align,
 					} );
 				},
 			},
@@ -118,10 +120,10 @@ registerBlockType( metadata.name, {
 				isMatch: ( { text } ) => {
 					return text ? true : false;
 				},
-				transform: ( { text, alignment } ) => {
+				transform: ( { text, textAlignment } ) => {
 					return createBlock( 'core/paragraph', {
 						content: text,
-						align: alignment,
+						align: textAlignment,
 					} );
 				},
 			},
