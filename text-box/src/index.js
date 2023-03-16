@@ -13,7 +13,7 @@ import { registerBlockType } from '@wordpress/blocks';
  * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
  */
 import './style.scss';
-
+import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -58,4 +58,16 @@ registerBlockType( metadata.name, {
 	 * @see ./save.js
 	 */
 	save,
+	// This adds a variation. The details are different from the block.json file since we are making a new name and title, etc.
+	// Now in our block, we have a new block that is called Gradient Text Box. It has the same functionality, just has a different default gradient background.
+	variations: [
+		{
+			name: 'blocks-course/gradient-text-box',
+			title: __( 'Gradient Text Box' ),
+			icon: 'wordpress',
+			attributes: {
+				gradient: 'red-to-blue',
+			},
+		},
+	],
 } );
