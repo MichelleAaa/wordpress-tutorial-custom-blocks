@@ -191,7 +191,68 @@ __webpack_require__.r(__webpack_exports__);
     attributes: {
       gradient: 'red-to-blue'
     }
-  }]
+  }],
+  // transforms shows up in the editor panel hover toolbar over the block. 
+  // We are transforming from the paragraph block, at core/paragram. (So the paragraph block will now have an option to transform into our custom block, the text-box.)
+  // The transform function is the one that's responsible for doing the transforming. -- It receives the attributes of the block that we are transforming from. -- The return function is our function, the blocks-course/text-box. Then we are sending over the text content and alignment selection. (Note that text and alignment are properties in our block.json file, and we are getting content and align from the paragraph element.)
+  transforms: {
+    from: [{
+      type: 'block',
+      blocks: ['core/paragraph'],
+      transform: _ref => {
+        let {
+          content,
+          align
+        } = _ref;
+        return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('blocks-course/text-box', {
+          text: content,
+          alignment: align
+        });
+      }
+    },
+    // Enter is when you type in the regex expression and press enter. It will then create a text-box. (So if you are in the paragraph box and type textbox, it will create the text-box block.) -- We are also passing some attributes of shadow and gradient.
+    {
+      type: 'enter',
+      regExp: /textbox/i,
+      transform: () => {
+        return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('blocks-course/text-box', {
+          shadow: true,
+          gradient: 'red-to-blue'
+        });
+      }
+    },
+    // We can open a pargraph and type in textbox plus a space, and it will generate a textbox. 
+    {
+      type: 'prefix',
+      prefix: 'textbox',
+      transform: () => {
+        return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('blocks-course/text-box');
+      }
+    }],
+    // This can transform our custom text-box block into a standard WP paragraph block.
+    // The transform function receives the attributes of our block. (Our text-box, in the block.json file, has text and alignment properties. The WP paragraph block calls these content and align.) -- Now in our text-box, when we select the first option in the hover toolbar, transform to - Paragraph will be an option.
+    // isMatch is a function that receives our text-box attributes. we can return true or false based on something in our attributes. (it controls whether the transform option is visible.) -- If we don't have content, aka text, in the text-box, then we can't transform it into a paragraph.
+    to: [{
+      type: 'block',
+      blocks: ['core/paragraph'],
+      isMatch: _ref2 => {
+        let {
+          text
+        } = _ref2;
+        return text ? true : false;
+      },
+      transform: _ref3 => {
+        let {
+          text,
+          alignment
+        } = _ref3;
+        return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('core/paragraph', {
+          content: text,
+          align: alignment
+        });
+      }
+    }]
+  }
 });
 
 /***/ }),
