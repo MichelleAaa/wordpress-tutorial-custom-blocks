@@ -9,6 +9,9 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": function() { return /* binding */ Edit; }
+/* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__);
@@ -23,14 +26,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function Edit(props) {
-  // These properties are coming in part from the higher-order function at the bottom, withColors, which returns Edit, after adding properties. 
   const {
     attributes,
-    setAttributes,
-    backgroundColor,
-    textColor,
-    setBackgroundColor,
-    setTextColor
+    setAttributes
   } = props;
   const {
     text,
@@ -46,34 +44,11 @@ function Edit(props) {
       text: newText
     });
   };
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.InspectorControls, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.PanelColorSettings, {
-    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Color Settings', 'text-box'),
-    icon: "admin-appearance",
-    initialOpen: true,
-    disableCustomColors: false
-    // This allows the user to also select a custom color, instead of only being able to choose what’s available in the theme for custom colors listed in functions.php.
-    ,
-    colorSettings: [{
-      value: backgroundColor.color,
-      onChange: setBackgroundColor,
-      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Background Color', 'text-box')
-    }, {
-      value: textColor.color,
-      onChange: setTextColor,
-      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Text Color', 'text-box')
-    }]
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.ContrastChecker, {
-    textColor: textColor.color,
-    backgroundColor: backgroundColor.color
-  }))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.BlockControls, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.AlignmentToolbar, {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.BlockControls, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.AlignmentToolbar, {
     value: alignment,
     onChange: onChangeAlignment
   })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.RichText, (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.useBlockProps)({
-    className: `text-box-align-${alignment}`,
-    style: {
-      backgroundColor: backgroundColor.color,
-      color: textColor.color
-    }
+    className: `text-box-align-${alignment}`
   }), {
     onChange: onChangeText,
     value: text,
@@ -84,12 +59,6 @@ function Edit(props) {
 }
 // Note that __ is used so we can enable translations later.
 // allowedFormats will indicate what will show up in the hover editor option menu. -- When we indicated core/bold, we limited the options down to just this one.
-
-// withColors is a function that returns another function. -- The edit function is now wrapped in this higher-order function.
-/* harmony default export */ __webpack_exports__["default"] = ((0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_3__.withColors)({
-  backgroundColor: "backgroundColor",
-  textColor: "color"
-})(Edit));
 
 /***/ }),
 
@@ -204,32 +173,15 @@ function save(_ref) {
   } = _ref;
   const {
     text,
-    alignment,
-    backgroundColor,
-    textColor,
-    customBackgroundColor,
-    customTextColor
+    alignment
   } = attributes;
-  const backgroundClass = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.getColorClassName)('background-color', backgroundColor);
-  const textClass = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.getColorClassName)('color', textColor);
-  const classes = classnames__WEBPACK_IMPORTED_MODULE_3___default()(`text-box-align-${alignment}`, {
-    [textClass]: textClass,
-    [backgroundClass]: backgroundClass
-  });
-  return (
-    // Note that we switched className to classes, as we are now using the classnames module.
-    // For style, we only add it if we don't have a backgroundClass. Otherwise, we will add our customBackgroundColor, which lives in our attributes (and was set up in block.json)
-    (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText.Content, (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps.save({
-      className: classes,
-      style: {
-        backgroundColor: backgroundClass ? undefined : customBackgroundColor,
-        color: textClass ? undefined : customTextColor
-      }
-    }), {
-      tagName: "h4",
-      value: text
-    }))
-  );
+  const classes = classnames__WEBPACK_IMPORTED_MODULE_3___default()(`text-box-align-${alignment}`);
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText.Content, (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps.save({
+    className: classes
+  }), {
+    tagName: "h4",
+    value: text
+  }));
 }
 
 // RichText returns an editable text input. But in the save function, we need to display what will display in the front-end, so it shouldn't be editable in the front-end for this component. -- That's why we are using RichText.Content, to display the content.
@@ -410,7 +362,7 @@ function _extends() {
 /***/ (function(module) {
 
 "use strict";
-module.exports = JSON.parse('{"apiVersion":2,"name":"blocks-course/text-box","title":"Text Box","category":"text","icon":"text-page","description":"A box of text.","keywords":["text","paragraph","box"],"supports":{"html":false},"textdomain":"text-box","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"text":{"type":"string","source":"html","selector":"h4"},"alignment":{"type":"string","default":"left"},"backgroundColor":{"type":"string"},"textColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customTextColor":{"type":"string"}}}');
+module.exports = JSON.parse('{"apiVersion":2,"name":"blocks-course/text-box","title":"Text Box","category":"text","icon":"text-page","description":"A box of text.","keywords":["text","paragraph","box"],"supports":{"html":false,"color":{"background":true,"text":true,"gradients":true}},"textdomain":"text-box","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"text":{"type":"string","source":"html","selector":"h4"},"alignment":{"type":"string","default":"left"},"backgroundColor":{"type":"string"},"textColor":{"type":"string","default":"very-light-gray"},"gradient":{"type":"string"},"style":{"type":"object","default":{"color":{"background":"#f03"}}}}}');
 
 /***/ })
 
