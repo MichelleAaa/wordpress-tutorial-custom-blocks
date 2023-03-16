@@ -20,6 +20,7 @@ import { __ } from '@wordpress/i18n';
 import Edit from './edit';
 import save from './save';
 import metadata from './block.json';
+import v1 from './v1';
 
 /**
  * Every block starts by registering a new block type definition.
@@ -58,6 +59,8 @@ registerBlockType( metadata.name, {
 	 * @see ./save.js
 	 */
 	save,
+	// Here we can have an array for each depricated version. You can type it in here, but instead, we are importing it.
+	deprecated: [ v1 ],
 	// This adds a variation. The details are different from the block.json file since we are making a new name and title, etc.
 	// Now in our block, we have a new block that is called Gradient Text Box. It has the same functionality, just has a different default gradient background.
 	variations: [
