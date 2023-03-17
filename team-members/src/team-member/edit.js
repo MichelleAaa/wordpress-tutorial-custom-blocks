@@ -3,22 +3,73 @@ import {
 	useBlockProps,
 	RichText,
 	MediaPlaceholder,
+	BlockControls,
+	MediaReplaceFlow,
+	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+// Above, we are accessing the store so we can access the image sizes that are available in the WP media. You can access the store in the console in the editor by typing - wp.data.select("core").getMedia(id of an image you want to get information about) -- inside the object, there's media_details. Inside, is sizes. Inside of that, is a list of the image sizes that were generated for that image. (It depends on which theme as to which sizes are available.)
+//to get the sizes currently defined in the theme you are using - wp.data.select("core/block-editor").getSettings() -- then look inside the imageSizes key, which will show you the image sizes available in this theme. -- so we only want to access a size that's avaialble in the theme and also available for that image.
+// However, in the block itself, we can't use the developer console commands. So to access the store, we need the below as well:
+import { useSelect } from '@wordpress/data';
+// The above will allow us to select data from the store. (which is brought in above.)
 import { __ } from '@wordpress/i18n';
 import { isBlobURL, revokeBlobURL } from '@wordpress/blob';
 // isBlobURL receives a url and determines if it's a blob url.
-import { Spinner, withNotices } from '@wordpress/components';
+import {
+	Spinner,
+	withNotices,
+	ToolbarButton,
+	PanelBody,
+	TextareaControl,
+	SelectControl,
+} from '@wordpress/components';
 
 // Attributes in this case are coming from index.js, where it's set up -- instead of in block.json, since this is a child block and that's where we set up attrs.
 function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 	const { name, bio, url, alt, id } = attributes;
 	const [ blobURL, setBlobURL ] = useState();
 
+	// We use useSelect to get data from the store. Here, we are selecting from the 'core' store, and getting the getMedia function so we can check the id with getMedia, if there is one.
+	const imageObject = useSelect(
+		( select ) => {
+			const { getMedia } = select( 'core' );
+			return id ? getMedia( id ) : null;
+		},
+		[ id ]
+		// [id] is the dependency
+	);
+
+	const imageSizes = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().imageSizes;
+	}, [] );
+
+	const getImageSizeOptions = () => {
+		// If the request is still resolving, we wouldn't have the image yet, so we just return an empty array.
+		if ( ! imageObject ) return [];
+		const options = [];
+		const sizes = imageObject.media_details.sizes;
+		for ( const key in sizes ) {
+			const size = sizes[ key ];
+			const imageSize = imageSizes.find( ( s ) => s.slug === key );
+			if ( imageSize ) {
+				options.push( {
+					label: imageSize.name,
+					value: size.source_url,
+				} );
+			}
+		}
+		return options;
+	};
+
 	const onChangeName = ( newName ) => {
 		setAttributes( { name: newName } );
 	};
 	const onChangeBio = ( newBio ) => {
 		setAttributes( { bio: newBio } );
+	};
+	const onChangeAlt = ( newAlt ) => {
+		setAttributes( { alt: newAlt } );
 	};
 	const onSelectImage = ( image ) => {
 		if ( ! image || ! image.url ) {
@@ -35,11 +86,22 @@ function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 			alt: '',
 		} );
 	};
+	const onChangeImageSize = ( newURL ) => {
+		setAttributes( { url: newURL } );
+	};
 	// To display errors, in the MediaPlaceholder we added the notices= prop. Then in our error call-back we use noticeOperations and pass it the message. (If you try to upload a php file or another non-approved file you will get an error.)
 	const onUploadError = ( message ) => {
 		// Before creating a new error, we clear the old error, in case there is one:
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
+	};
+
+	const removeImage = () => {
+		setAttributes( {
+			url: undefined,
+			alt: '',
+			id: undefined,
+		} );
 	};
 
 	useEffect( () => {
@@ -61,7 +123,52 @@ function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 	}, [ url ] ); // runs whenever the URL changes. -- this is for the image upload which is why we are using the BlobURL. -- Otherwise, we clear the state.
 
 	return (
-		
+	<>
+	{/* This is for the sidebar. It allows the user to change the ALT text of the image. -- If the image has alt text already it will show up there. -- It only changes the alt text for this block, not uploaded in the media. */}
+		<InspectorControls>
+			<PanelBody title={ __( 'Image Settings', 'team-members' ) }>
+				{/* This opens an option in the sidebar to select the image size. The url is the url of that specific image size. */}
+				{ id && (
+					<SelectControl
+						label={ __( 'Image Size', 'team-members' ) }
+						options={ getImageSizeOptions() }
+						value={ url }
+						onChange={ onChangeImageSize }
+					/>
+				) }
+				{/* A blubURL is still uploading, so we don't allow editing the alt text until it's uploaded, aka no longer a blobURL. */}
+				{ url && ! isBlobURL( url ) && (
+					<TextareaControl
+						label={ __( 'Alt Text', 'team-members' ) }
+						value={ alt }
+						onChange={ onChangeAlt }
+						help={ __(
+							"Alternative text describes your image to people can't see it. Add a short description with its key details.",
+							'team-members'
+						) }
+					/>
+				) }
+			</PanelBody>
+		</InspectorControls>
+	{/* This adds an option in the hover toolbar to replace the image. It has options to upload or open the media library. -- It only shows if the url has been entered, aka there's an image already. */}
+		{ url && (
+			<BlockControls group="inline">
+				<MediaReplaceFlow
+					name={ __( 'Replace Image', 'team-members' ) }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					accept="image/*"
+					allowedTypes={ [ 'image' ] }
+					mediaId={ id }
+					mediaURL={ url }
+				/>
+				{/* This adds a second button in the toolbar for Remove Image. */}
+				<ToolbarButton onClick={ removeImage }>
+					{ __( 'Remove Image', 'team-members' ) }
+				</ToolbarButton>
+			</BlockControls>
+		) }
 		<div { ...useBlockProps() }>
 			{/* The actual image only displays if we have a url (aka the user went through the MediaPlaceholder to upload or select an image from the media library.) */}
 			{ url && (
@@ -107,6 +214,7 @@ function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 				allowedFormats={ [] }
 			/>
 		</div>
+	</>
 	);
 }
 

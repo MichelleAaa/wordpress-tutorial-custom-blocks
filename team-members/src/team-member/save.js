@@ -4,6 +4,7 @@ export default function Save( { attributes } ) {
 	const { name, bio, url, alt, id } = attributes;
 	return (
 		<div { ...useBlockProps.save() }>
+			{/* If there's a url then we display the image. */}
 			{ url && (
 				<img
 					src={ url }
