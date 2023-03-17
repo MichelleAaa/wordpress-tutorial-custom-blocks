@@ -27,6 +27,7 @@
 		"stylelint": "^14.16.1"
 	},
 	"dependencies": {
+		"@wordpress/blob": "^3.29.0",
 		"@wordpress/components": "^23.6.0"
 	}
 }
