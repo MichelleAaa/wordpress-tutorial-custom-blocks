@@ -1,4 +1,4 @@
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import {
 	useBlockProps,
 	RichText,
@@ -13,6 +13,7 @@ import {
 // However, in the block itself, we can't use the developer console commands. So to access the store, we need the below as well:
 import { useSelect } from '@wordpress/data';
 // The above will allow us to select data from the store. (which is brought in above.)
+import { usePrevious } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { isBlobURL, revokeBlobURL } from '@wordpress/blob';
 // isBlobURL receives a url and determines if it's a blob url.
@@ -29,6 +30,10 @@ import {
 function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 	const { name, bio, url, alt, id } = attributes;
 	const [ blobURL, setBlobURL ] = useState();
+
+	const prevURL = usePrevious( url );
+
+	const titleRef = useRef();
 
 	// We use useSelect to get data from the store. Here, we are selecting from the 'core' store, and getting the getMedia function so we can check the id with getMedia, if there is one.
 	const imageObject = useSelect(
@@ -122,6 +127,14 @@ function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 		}
 	}, [ url ] ); // runs whenever the URL changes. -- this is for the image upload which is why we are using the BlobURL. -- Otherwise, we clear the state.
 
+	// The below is to create focus on the next text line under the image after there's an image.
+	//We check to make sure we don't have a previousUrl (we didn't have a url/image before, becuase then the user may have already filled out the text on the line under the image.  Whether there was previously another url entered, and this is just a replacement, is tracked with a special hook from @wordpress/compose)
+	useEffect( () => {
+		if ( url && ! prevURL ) {
+			titleRef.current.focus();
+		}
+	}, [ url, prevURL ] );
+
 	return (
 	<>
 	{/* This is for the sidebar. It allows the user to change the ALT text of the image. -- If the image has alt text already it will show up there. -- It only changes the alt text for this block, not uploaded in the media. */}
@@ -199,6 +212,8 @@ function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 			/>
 			{/* // Richtext components are being used to render a place to add the Name and Member Bio. (These will render below the image.) */}
 			<RichText
+			// we added ref so we can auto-focus on this field after the image is added.
+				ref={titleRef}
 				placeholder={ __( 'Member Name', 'team-member' ) }
 				tagName="h4"
 				onChange={ onChangeName }
