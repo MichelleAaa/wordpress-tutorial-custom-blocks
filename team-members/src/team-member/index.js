@@ -43,6 +43,28 @@ registerBlockType( 'blocks-course/team-member', {
 			selector: 'img',
 			attribute: 'src',
 		},
+		socialLinks: {
+			type: 'array',
+			default: [
+				{ link: 'https:/facebook.com', icon: 'facebook' },
+				{ link: 'https:/instagram.com', icon: 'instagram' },
+			],
+			// A query can lookup multiple items. Here the selector is the classname plus ul, li.
+			source: 'query',
+			selector: '.wp-block-blocks-course-team-member-social-links ul li',
+			// This is to extract the data-icon attribute from each li.
+			query: {
+				icon: {
+					source: 'attribute',
+					attribute: 'data-icon',
+				},
+				link: {
+					source: 'attribute',
+					selector: 'a',
+					attribute: 'href',
+				},
+			},
+		},
 	},
 	edit: Edit,
 	save: Save,

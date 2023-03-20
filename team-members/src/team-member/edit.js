@@ -24,14 +24,46 @@ import {
 	PanelBody,
 	TextareaControl,
 	SelectControl,
+	Icon,
+	Tooltip,
+	TextControl,
+	Button,
 } from '@wordpress/components';
+import {
+	DndContext,
+	useSensor,
+	useSensors,
+	PointerSensor,
+} from '@dnd-kit/core';
+import {
+	SortableContext,
+	horizontalListSortingStrategy,
+	arrayMove,
+} from '@dnd-kit/sortable';
+import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
+// The modifiers library can add restrictions, so you can't move vertically when your list is only horizontal, for instance.
+import SortableItem from './sortable-item';
 
 // Attributes in this case are coming from index.js, where it's set up -- instead of in block.json, since this is a child block and that's where we set up attrs.
-function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
-	const { name, bio, url, alt, id } = attributes;
+function Edit( {
+	attributes,
+	setAttributes,
+	noticeOperations,
+	noticeUI,
+	isSelected,
+} ) {
+	const { name, bio, url, alt, id, socialLinks } = attributes;
 	const [ blobURL, setBlobURL ] = useState();
+	const [ selectedLink, setSelectedLink ] = useState();
 
 	const prevURL = usePrevious( url );
+	const prevIsSelected = usePrevious( isSelected );
+
+	const sensors = useSensors(
+		useSensor( PointerSensor, {
+			activationConstraint: { distance: 5 },
+		} ) //The distance controls how many pixels you have to move the pointer so that you can drop it somewhere new in the list.
+	);
 
 	const titleRef = useRef();
 
@@ -109,6 +141,48 @@ function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 		} );
 	};
 
+	const addNewSocialItem = () => {
+		// We pass in a copy of our original socialLinks, and then just add a new icon in addition.
+		setAttributes( {
+			socialLinks: [ ...socialLinks, { icon: 'wordpress', link: '' } ],
+		} );
+		setSelectedLink( socialLinks.length );
+	};
+
+	const updateSocialItem = ( type, value ) => {
+		const socialLinksCopy = [ ...socialLinks ];
+		socialLinksCopy[ selectedLink ][ type ] = value;
+		setAttributes( { socialLinks: socialLinksCopy } );
+	};
+
+	const removeSocialItem = () => {
+		// Slice from the beginning of the array up to where the selected link is, then slice out the index after the selected link to the end. Those two together create a new array (skipping the item we are removing.)
+		setAttributes( {
+			socialLinks: [
+				...socialLinks.slice( 0, selectedLink ),
+				...socialLinks.slice( selectedLink + 1 ),
+			],
+		} );
+		setSelectedLink();//This sets selectedLInk to undefined.
+	};
+
+	const handleDragEnd = ( event ) => {
+		const { active, over } = event;
+		if ( active && over && active.id !== over.id ) {
+			const oldIndex = socialLinks.findIndex(
+				( i ) => active.id === `${ i.icon }-${ i.link }`
+			);
+			const newIndex = socialLinks.findIndex(
+				( i ) => over.id === `${ i.icon }-${ i.link }`
+			);
+			// After finding the oldIndex and the newIndex items, we can use the ArrayMove method to make the update:
+			setAttributes( {
+				socialLinks: arrayMove( socialLinks, oldIndex, newIndex ),
+			} );
+			setSelectedLink( newIndex );
+		}
+	};
+
 	useEffect( () => {
 		if ( ! id && isBlobURL( url ) ) {
 			setAttributes( {
@@ -134,6 +208,13 @@ function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 			titleRef.current.focus();
 		}
 	}, [ url, prevURL ] );
+
+	useEffect( () => {
+		if ( prevIsSelected && ! isSelected ) {
+			setSelectedLink();
+			// this sets the selected link to undefined, so it isn't highlighted if you click out of the block. (otherwise, the social media icon will be selected even when you click out of the box in the editor.)
+		}
+	}, [ isSelected, prevIsSelected ] );
 
 	return (
 	<>
@@ -228,6 +309,104 @@ function Edit( { attributes, setAttributes, noticeOperations, noticeUI } ) {
 				value={ bio }
 				allowedFormats={ [] }
 			/>
+			<div className="wp-block-blocks-course-team-member-social-links">
+				<ul>
+					<DndContext
+						sensors={ sensors }
+						onDragEnd={ handleDragEnd }
+						modifiers={ [ restrictToHorizontalAxis ] }
+					>
+						<SortableContext
+							items={ socialLinks.map(
+								( item ) => `${ item.icon }-${ item.link }`
+							) }
+							strategy={ horizontalListSortingStrategy }
+						>
+							{ socialLinks.map( ( item, index ) => {
+								return (
+									<SortableItem
+										key={ `${ item.icon }-${ item.link }` }
+										id={ `${ item.icon }-${ item.link }` }
+										index={ index }
+										selectedLink={ selectedLink }
+										setSelectedLink={ setSelectedLink }
+										icon={ item.icon }
+									/>
+								);
+							} ) }
+						</SortableContext>
+					</DndContext>
+					{/* We are switching to draggable, as listed above (the li is now in sortable-item.js), so we are removing the below: */}
+					{/* { socialLinks.map( ( item, index ) => {
+						return (
+			// The icon component can be used to display dashicon icons:
+							<li
+									key={ index }
+									className={
+										selectedLink === index
+											? 'is-selected'
+											: null
+									}
+								>
+									<button
+										aria-label={ __(
+											'Edit Social Link',
+											'team-members'
+										) }
+										onClick={ () =>
+											setSelectedLink( index )
+										}
+									>
+										<Icon icon={ item.icon } />
+									</button>
+								</li>
+						);
+					} ) } */}
+					{ isSelected && (
+						<li className="wp-block-blocks-course-team-member-add-icon-li">
+							<Tooltip
+								text={ __(
+									'Add Social Link',
+									'team-members'
+								) }
+							>
+								<button
+									aria-label={ __(
+										'Add Social Link',
+										'team-members'
+									) }
+									onClick={ addNewSocialItem }
+								>
+									<Icon icon="plus" />
+								</button>
+							</Tooltip>
+						</li>
+					) }
+				</ul>
+			</div>
+			{/* The form appears when the social media icon is selected. It allows you to fill out the icon and url. */}
+			{ selectedLink !== undefined && (
+				<div className="wp-block-blocks-course-team-member-link-form">
+					<TextControl
+						label={ __( 'Icon', 'text-members' ) }
+						value={ socialLinks[ selectedLink ].icon }
+						onChange={ ( icon ) => {
+							updateSocialItem( 'icon', icon );
+						} }
+					/>
+					<TextControl
+						label={ __( 'URL', 'text-members' ) }
+						value={ socialLinks[ selectedLink ].link }
+						onChange={ ( link ) => {
+							updateSocialItem( 'link', link );
+						} }
+					/>
+					<br />
+					<Button isDestructive onClick={ removeSocialItem }>
+						{ __( 'Remove Link', 'text-members' ) }
+					</Button>
+				</div>
+			) }
 		</div>
 	</>
 	);
