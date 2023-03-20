@@ -45,10 +45,7 @@ registerBlockType( 'blocks-course/team-member', {
 		},
 		socialLinks: {
 			type: 'array',
-			default: [
-				{ link: 'https:/facebook.com', icon: 'facebook' },
-				{ link: 'https:/instagram.com', icon: 'instagram' },
-			],
+			default: [],
 			// A query can lookup multiple items. Here the selector is the classname plus ul, li.
 			source: 'query',
 			selector: '.wp-block-blocks-course-team-member-social-links ul li',
