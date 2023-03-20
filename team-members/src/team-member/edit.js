@@ -204,7 +204,7 @@ function Edit( {
 	// The below is to create focus on the next text line under the image after there's an image.
 	//We check to make sure we don't have a previousUrl (we didn't have a url/image before, becuase then the user may have already filled out the text on the line under the image.  Whether there was previously another url entered, and this is just a replacement, is tracked with a special hook from @wordpress/compose)
 	useEffect( () => {
-		if ( url && ! prevURL ) {
+		if ( url && ! prevURL && isSelected ) {
 			titleRef.current.focus();
 		}
 	}, [ url, prevURL ] );
