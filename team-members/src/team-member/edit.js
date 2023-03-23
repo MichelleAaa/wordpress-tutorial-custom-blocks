@@ -48,6 +48,7 @@ import SortableItem from './sortable-item';
 function Edit( {
 	attributes,
 	setAttributes,
+	context, // context will give us access to anything that was set up in the usesContext section of this child block's index.js file.
 	noticeOperations,
 	noticeUI,
 	isSelected,
@@ -291,6 +292,9 @@ function Edit( {
 				// diableMediaButtons url means that if url is true, then the MediaPlaceholder no longer will display -- we want this once we have the image url so the image can render in the code above.
 				notices={ noticeUI }
 			/>
+			{ context[ 'blocks-course/team-members-columns' ] }
+			{/* The above outputs 2, as that's the number from the block.json parent file. */}
+			
 			{/* // Richtext components are being used to render a place to add the Name and Member Bio. (These will render below the image.) */}
 			<RichText
 			// we added ref so we can auto-focus on this field after the image is added.

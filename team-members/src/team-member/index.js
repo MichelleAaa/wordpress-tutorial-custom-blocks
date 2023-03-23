@@ -16,6 +16,7 @@ registerBlockType( 'blocks-course/team-member', {
 		reusable: false,
 		html: false,
 	},
+	usesContext: [ 'blocks-course/team-members-columns' ], // you pass an array of the items you want to pass to the child element from the parent block.json file.
 	attributes: {
 		name: {
 			type: 'string',

@@ -13,7 +13,13 @@
     "@wordpress/scripts": "^26.0.0"
   },
   "dependencies": {
+    "@wordpress/block-editor": "^11.6.0",
+    "@wordpress/components": "^23.6.0",
     "@wordpress/data": "^8.6.0",
-    "@wordpress/i18n": "^4.29.0"
+    "@wordpress/edit-post": "^7.6.0",
+    "@wordpress/hooks": "^3.29.0",
+    "@wordpress/i18n": "^4.29.0",
+    "@wordpress/plugins": "^5.6.0",
+    "@wordpress/rich-text": "^6.6.0"
   }
 }

@@ -5418,7 +5418,63 @@ __webpack_require__.r(__webpack_exports__);
 
 (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.registerBlockType)('blocks-course/team-members', {
   edit: _edit__WEBPACK_IMPORTED_MODULE_3__["default"],
-  save: _save__WEBPACK_IMPORTED_MODULE_4__["default"]
+  save: _save__WEBPACK_IMPORTED_MODULE_4__["default"],
+  // Transforms is used to transform from or to another WP Block type.
+  transforms: {
+    from: [
+    // Transform from the gallery block to the team-members block:
+    {
+      type: 'block',
+      blocks: ['core/gallery'],
+      transform: _ref => {
+        let {
+          images,
+          columns
+        } = _ref;
+        // For each image, we create a new innerBlock:
+        const innerBlocks = images.map(_ref2 => {
+          let {
+            url,
+            id,
+            alt
+          } = _ref2;
+          return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('blocks-course/team-member', {
+            alt,
+            id,
+            url
+          });
+        });
+        return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('blocks-course/team-members', {
+          // if columns is not specified, we default to 2.
+          columns: columns || 2
+        }, innerBlocks);
+      }
+    }, {
+      // Transform from the image block to the team-member block
+      type: 'block',
+      blocks: ['core/image'],
+      isMultiBlock: true,
+      transform: attributes => {
+        // For each item in attributes, we get a block.
+        const innerBlocks = attributes.map(_ref3 => {
+          let {
+            url,
+            id,
+            alt
+          } = _ref3;
+          return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('blocks-course/team-member', {
+            alt,
+            id,
+            url
+          });
+        });
+        return (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.createBlock)('blocks-course/team-members', {
+          // maximum of 3 images can be transferred:
+          columns: attributes.length > 3 ? 3 : attributes.length
+        }, innerBlocks);
+      }
+    }]
+  }
 });
 
 /***/ }),
@@ -5502,6 +5558,8 @@ function Edit(_ref) {
   let {
     attributes,
     setAttributes,
+    context,
+    // context will give us access to anything that was set up in the usesContext section of this child block's index.js file.
     noticeOperations,
     noticeUI,
     isSelected
@@ -5674,7 +5732,7 @@ function Edit(_ref) {
   // The below is to create focus on the next text line under the image after there's an image.
   //We check to make sure we don't have a previousUrl (we didn't have a url/image before, becuase then the user may have already filled out the text on the line under the image.  Whether there was previously another url entered, and this is just a replacement, is tracked with a special hook from @wordpress/compose)
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (url && !prevURL) {
+    if (url && !prevURL && isSelected) {
       titleRef.current.focus();
     }
   }, [url, prevURL]);
@@ -5726,7 +5784,7 @@ function Edit(_ref) {
     // diableMediaButtons url means that if url is true, then the MediaPlaceholder no longer will display -- we want this once we have the image url so the image can render in the code above.
     ,
     notices: noticeUI
-  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.RichText
+  }), context['blocks-course/team-members-columns'], (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.RichText
   // we added ref so we can auto-focus on this field after the image is added.
   , {
     ref: titleRef,
@@ -5822,6 +5880,8 @@ __webpack_require__.r(__webpack_exports__);
     reusable: false,
     html: false
   },
+  usesContext: ['blocks-course/team-members-columns'],
+  // you pass an array of the items you want to pass to the child element from the parent block.json file.
   attributes: {
     name: {
       type: 'string',
@@ -5851,13 +5911,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     socialLinks: {
       type: 'array',
-      default: [{
-        link: 'https:/facebook.com',
-        icon: 'facebook'
-      }, {
-        link: 'https:/instagram.com',
-        icon: 'instagram'
-      }],
+      default: [],
       // A query can lookup multiple items. Here the selector is the classname plus ul, li.
       source: 'query',
       selector: '.wp-block-blocks-course-team-member-social-links ul li',

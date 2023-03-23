@@ -15,6 +15,11 @@
 //  This plugin will be a custom data store we create (instead of connecting to the wp standard store).
 // We don't need a block.json file since this won't be a block component. It's a plugin that other plugins could access the data store from.
 
+include_once('metabox.php');
+include_once('templates.php');
+include_once('patterns.php');
+include_once('filters.php');
+
 function blocks_course_plugin__enqueue_assets() {
 
     $asset_file = include(plugin_dir_path( __FILE__ ) . 'build/index.asset.php');

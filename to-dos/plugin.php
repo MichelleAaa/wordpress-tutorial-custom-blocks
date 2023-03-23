@@ -8,7 +8,7 @@
  * Author:            Ali Alaa
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       todo-list
+ * Text Domain:       blocks-course-todo-list
  *
  * @package           blocks-course
  */

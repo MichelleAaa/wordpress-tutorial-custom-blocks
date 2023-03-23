@@ -1,15 +1,14 @@
 {
 	"apiVersion": 2,
-	"name": "blocks-course/todo-list",
-	"version": "0.1.0",
-	"title": "Todo List",
+	"name": "blocks-course/metadata-block",
+	"title": "Metadata Block",
 	"category": "widgets",
-	"icon": "smiley",
-	"description": "Display and edit todos in the data store.",
+	"icon": "admin-settings",
+	"description": "Example of editing meta using blocks.",
 	"supports": {
 		"html": false
 	},
-	"textdomain": "blocks-course-todo-list",
+	"textdomain": "metadata-block",
 	"editorScript": "file:./build/index.js",
 	"editorStyle": "file:./build/index.css",
 	"style": "file:./build/style-index.css"
